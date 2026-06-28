@@ -533,8 +533,8 @@
         atualizarBotaoSobre();
     }
 
-    // ============================================================
-    // BUSCAR ARMÁRIOS (USUÁRIO)
+     // ============================================================
+    // BUSCAR ARMÁRIOS (USUÁRIO) - CORRIGIDO COM ORDEM
     // ============================================================
     window.buscarEFiltrarArmarios = async function() {
         console.log('🔍 Buscando armários...');
@@ -575,7 +575,14 @@
         const grid = document.getElementById("lockerGrid");
         grid.innerHTML = "";
 
-        for (let locker of lockersList) {
+        // 🔥 CORREÇÃO: Ordena os armários ANTES de exibir (L001, L002, L003...)
+        const lockersOrdenados = [...lockersList].sort((a, b) => {
+            const numA = parseInt(a.replace('L', ''));
+            const numB = parseInt(b.replace('L', ''));
+            return numA - numB;
+        });
+
+        for (let locker of lockersOrdenados) {
             const disp = await apiCall('/armarios/disponibilidade', 'POST', { armario: locker, inicioTimestamp: inicioTs, duracaoHoras: duracao });
             const ocupado = !disp.ok || !disp.data.disponivel;
             const motivo = disp.data?.motivo || '';
