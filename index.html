@@ -407,18 +407,25 @@
     // ============================================================
     // API (SEGURA)
     // ============================================================
+        // ============================================================
+    // API (SEGURA)
+    // ============================================================
     async function apiCall(endpoint, method = 'GET', data = null) {
-        const options = { method, headers: { 'Content-Type': 'application/json' } };
-        if (data) options.body = JSON.stringify(data);
+        const options = { 
+            method: method, 
+            headers: { 'Content-Type': 'application/json' },
+            body: data ? JSON.stringify(data) : undefined
+        };
         try {
+            console.log(`📡 Enviando ${method} para ${API_URL}${endpoint}`, data);
             const resp = await fetch(`${API_URL}${endpoint}`, options);
             const text = await resp.text();
             let json;
             try {
                 json = JSON.parse(text);
             } catch (e) {
-                console.error('❌ Resposta não é JSON (HTML):', text.substring(0, 200));
-                return { ok: false, status: resp.status, data: { error: 'Servidor retornou HTML. Verifique a rota e a porta.' } };
+                console.error('❌ Resposta não é JSON:', text.substring(0, 200));
+                return { ok: false, status: resp.status, data: { error: 'Servidor retornou HTML.' } };
             }
             console.log(`📡 ${method} ${endpoint} -> status: ${resp.status}`, json);
             return { ok: resp.ok, status: resp.status, data: json };
@@ -427,7 +434,6 @@
             return { ok: false, status: 0, data: { error: `Erro de conexão: ${error.message}` } };
         }
     }
-
     // ============================================================
     // NEGÓCIO USUÁRIO (RESERVAS)
     // ============================================================
@@ -834,11 +840,18 @@
     // ============================================================
     // LOGIN / CADASTRO
     // ============================================================
+       // ============================================================
+    // LOGIN
+    // ============================================================
     async function doLogin(e) {
         if (e) e.preventDefault();
         const mat = document.getElementById("loginMatricula").value.trim();
-        const senha = document.getElementById("loginSenha").value;
+        const senha = document.getElementById("loginSenha").value.trim();
+        
+        console.log('📝 Tentando login:', { matricula: mat, senha: '***' });
+
         try {
+            // VERIFICA SE É ADMIN
             if (mat === 'admin' && senha === 'admin123') {
                 const result = await apiCall('/admin/login', 'POST', { usuario: mat, senha });
                 if (result.ok && result.data?.success) {
@@ -853,11 +866,17 @@
                 return;
             }
 
+            // LOGIN NORMAL
             const result = await apiCall('/login', 'POST', { matricula: mat, senha });
+            console.log('📥 Resposta do login:', result);
+            
             if (result.ok && result.data?.success) {
                 usuarioLogado = result.data.user;
                 isAdmin = false;
-                sessionStorage.setItem("guardafacil_session", JSON.stringify({ matricula: mat, nome: result.data.user.nome }));
+                sessionStorage.setItem("guardafacil_session", JSON.stringify({ 
+                    matricula: mat, 
+                    nome: result.data.user.nome 
+                }));
                 showScreen('dashboard');
                 await renderizarDashboard();
                 initDashboardEvents();
@@ -866,111 +885,83 @@
                 atualizarNavbarSobre();
                 atualizarBotaoSobre();
             } else {
-                document.getElementById("loginError").innerText = result.data?.error || "Credenciais inválidas.";
+                const erroMsg = result.data?.error || "Credenciais inválidas.";
+                document.getElementById("loginError").innerText = erroMsg;
+                console.error('❌ Erro no login:', erroMsg);
             }
         } catch (error) {
-            console.error('Erro no login:', error);
+            console.error('❌ Erro no login:', error);
             document.getElementById("loginError").innerText = "Erro de conexão com o servidor.";
         }
     }
 
+        // ============================================================
+    // CADASTRO
+    // ============================================================
     async function doCadastro(e) {
         if (e) e.preventDefault();
+        
+        // PEGA OS VALORES E REMOVE ESPAÇOS
         const nome = document.getElementById("cadNome").value.trim();
         const mat = document.getElementById("cadMatricula").value.trim();
-        const senha = document.getElementById("cadSenha").value;
+        const senha = document.getElementById("cadSenha").value.trim();
+
+        // LOG PARA VER O QUE ESTÁ SENDO ENVIADO
+        console.log('📝 Nome:', nome);
+        console.log('📝 Matrícula:', mat);
+        console.log('📝 Senha:', senha);
+
+        // VALIDAÇÃO 1: campos vazios
         if (!nome || !mat || !senha) {
             document.getElementById("cadError").innerText = "Preencha todos os campos.";
+            console.error('❌ Campos vazios!');
             return;
         }
+
+        // VALIDAÇÃO 2: senha muito curta
+        if (senha.length < 6) {
+            document.getElementById("cadError").innerText = "A senha deve ter pelo menos 6 caracteres.";
+            return;
+        }
+
+        // VALIDAÇÃO 3: matrícula muito curta
+        if (mat.length < 5) {
+            document.getElementById("cadError").innerText = "Matrícula inválida (mínimo 5 caracteres).";
+            return;
+        }
+
         try {
-            const result = await apiCall('/cadastro', 'POST', { matricula: mat, nome, senha });
-            if (result.ok && result.data?.success) {
-                alert("Cadastro realizado! Faça login.");
-                showScreen('login');
+            // CHAMA A API DIRETAMENTE COM FETCH PARA TER MAIS CONTROLE
+            const response = await fetch(`${API_URL}/cadastro`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    matricula: mat,
+                    nome: nome,
+                    senha: senha
+                })
+            });
+
+            const data = await response.json();
+            console.log('📥 Resposta do servidor:', data);
+
+            if (response.ok && data.success) {
+                alert("✅ Cadastro realizado! Faça login.");
+                // Limpa os campos
+                document.getElementById("cadNome").value = "";
+                document.getElementById("cadMatricula").value = "";
+                document.getElementById("cadSenha").value = "";
                 document.getElementById("cadError").innerText = "";
+                showScreen('login');
             } else {
-                document.getElementById("cadError").innerText = result.data?.error || "Erro no cadastro.";
+                const erroMsg = data.error || data.message || "Erro no cadastro.";
+                document.getElementById("cadError").innerText = erroMsg;
+                console.error('❌ Erro:', erroMsg);
             }
         } catch (error) {
-            console.error('Erro no cadastro:', error);
-            document.getElementById("cadError").innerText = "Erro de conexão.";
+            console.error('❌ Erro no cadastro:', error);
+            document.getElementById("cadError").innerText = "Erro de conexão com o servidor.";
         }
-    }
-
-    function checkAutoLogin() {
-        const sessao = sessionStorage.getItem("guardafacil_session");
-        if (sessao) {
-            try {
-                const { matricula, nome } = JSON.parse(sessao);
-                if (matricula) {
-                    usuarioLogado = { matricula, nome };
-                    isAdmin = (matricula === 'admin');
-                    if (isAdmin) {
-                        showScreen('adminDashboard');
-                        carregarAdminDashboard();
-                    } else {
-                        showScreen('dashboard');
-                        renderizarDashboard();
-                        initDashboardEvents();
-                        buscarEFiltrarArmarios();
-                    }
-                    atualizarNavbarSobre();
-                    atualizarBotaoSobre();
-                    return true;
-                }
-            } catch(e) { console.error('Erro ao ler sessão', e); }
-        }
-        return false;
-    }
-
-    function initDashboardEvents() {
-        const select = document.getElementById("duracaoHoras");
-        select.innerHTML = "";
-        for (let i=1; i<=24; i++) {
-            const opt = document.createElement("option");
-            opt.value = i;
-            opt.textContent = `${i} ${i===1?'hora':'horas'}`;
-            select.appendChild(opt);
-        }
-        select.value = "2";
-
-        const btnAtualizar = document.getElementById("atualizarDisponibilidadeBtn");
-        btnAtualizar.addEventListener('click', function(e) {
-            e.preventDefault();
-            buscarEFiltrarArmarios();
-        });
-
-        const now = new Date();
-        now.setMinutes(now.getMinutes() + 30);
-        const dia = String(now.getDate()).padStart(2,'0');
-        const mes = String(now.getMonth()+1).padStart(2,'0');
-        const ano = now.getFullYear();
-        let h = now.getHours(), m = now.getMinutes();
-        let mins = h*60 + m;
-        if (mins < 460) { h = 7; m = 40; }
-        if (mins > 1360) { h = 22; m = 40; }
-        document.getElementById("dataInicio").value = `${dia}/${mes}/${ano}`;
-        document.getElementById("horaInicio").value = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-
-        document.getElementById("dataInicio").addEventListener("input", function(e) {
-            let v = e.target.value.replace(/\D/g,'');
-            if (v.length > 8) v = v.slice(0,8);
-            if (v.length >= 5) v = v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4);
-            else if (v.length >= 3) v = v.slice(0,2)+'/'+v.slice(2);
-            e.target.value = v;
-        });
-        document.getElementById("horaInicio").addEventListener("input", function(e) {
-            let v = e.target.value.replace(/\D/g,'');
-            if (v.length > 4) v = v.slice(0,4);
-            if (v.length >= 3) v = v.slice(0,2)+':'+v.slice(2);
-            e.target.value = v;
-        });
-
-        document.getElementById('sobreBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            showScreen('sobre');
-        });
     }
 
     // ============================================================
