@@ -629,6 +629,96 @@
         }
     };
 
+        // ============================================================
+    // INICIALIZAÇÃO DO DASHBOARD
+    // ============================================================
+    function initDashboardEvents() {
+        console.log('🔄 Inicializando dashboard...');
+        
+        // 1. Preenche o select de duração
+        const select = document.getElementById("duracaoHoras");
+        if (select) {
+            select.innerHTML = "";
+            for (let i = 1; i <= 24; i++) {
+                const opt = document.createElement("option");
+                opt.value = i;
+                opt.textContent = `${i} ${i === 1 ? 'hora' : 'horas'}`;
+                select.appendChild(opt);
+            }
+            select.value = "2";
+        }
+
+        // 2. Botão "Verificar armários disponíveis"
+        const btnAtualizar = document.getElementById("atualizarDisponibilidadeBtn");
+        if (btnAtualizar) {
+            // Remove listeners antigos para evitar duplicação
+            const novoBtn = btnAtualizar.cloneNode(true);
+            btnAtualizar.parentNode.replaceChild(novoBtn, btnAtualizar);
+            novoBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🔄 Botão "Verificar armários" clicado');
+                if (typeof window.buscarEFiltrarArmarios === 'function') {
+                    window.buscarEFiltrarArmarios();
+                } else {
+                    console.error('❌ buscarEFiltrarArmarios não encontrada');
+                }
+            });
+        }
+
+        // 3. Preenche data e hora atual
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 30);
+        const dia = String(now.getDate()).padStart(2, '0');
+        const mes = String(now.getMonth() + 1).padStart(2, '0');
+        const ano = now.getFullYear();
+        let h = now.getHours(),
+            m = now.getMinutes();
+        let mins = h * 60 + m;
+        if (mins < 460) { h = 7;
+            m = 40; }
+        if (mins > 1360) { h = 22;
+            m = 40; }
+
+        const dataInput = document.getElementById("dataInicio");
+        const horaInput = document.getElementById("horaInicio");
+        if (dataInput) dataInput.value = `${dia}/${mes}/${ano}`;
+        if (horaInput) horaInput.value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+        console.log('📅 Data preenchida:', dataInput?.value);
+        console.log('🕐 Hora preenchida:', horaInput?.value);
+
+        // 4. Máscaras de data e hora
+        if (dataInput) {
+            dataInput.addEventListener("input", function(e) {
+                let v = e.target.value.replace(/\D/g, '');
+                if (v.length > 8) v = v.slice(0, 8);
+                if (v.length >= 5) v = v.slice(0, 2) + '/' + v.slice(2, 4) + '/' + v.slice(4);
+                else if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
+                e.target.value = v;
+            });
+        }
+
+        if (horaInput) {
+            horaInput.addEventListener("input", function(e) {
+                let v = e.target.value.replace(/\D/g, '');
+                if (v.length > 4) v = v.slice(0, 4);
+                if (v.length >= 3) v = v.slice(0, 2) + ':' + v.slice(2);
+                e.target.value = v;
+            });
+        }
+
+        // 5. Botão "Sobre"
+        const sobreBtn = document.getElementById('sobreBtn');
+        if (sobreBtn) {
+            sobreBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showScreen('sobre');
+            });
+        }
+
+        console.log('✅ Dashboard inicializado!');
+    }
+
     // ============================================================
     // ADMIN
     // ============================================================
