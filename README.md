@@ -31,7 +31,10 @@ O GuardaFácil é uma plataforma web que permite que alunos reservem armários d
 | **API** | RESTful |
 
 ---
+## Link do projeto
+ https://o-cego-que-ve.github.io/guardafacil/
 
+---
 👨‍🎓 Contexto Acadêmico
 Este projeto foi desenvolvido como parte das atividades práticas da disciplina de Introdução à Computação, integrante da grade curricular do Bacharelado em Ciência da Computação do IFRS – Campus Ibirubá.
 
