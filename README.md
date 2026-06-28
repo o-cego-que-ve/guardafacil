@@ -32,24 +32,6 @@ O GuardaFácil é uma plataforma web que permite que alunos reservem armários d
 
 ---
 
-🔑 Credenciais de Teste
-
-Usuários comuns
-
-Matrícula	 Senha
-
-20240012	 123456
-
-20240001	 senha123
-
-
-Administrador
-
-Usuário	 Senha
-
-admin	   admin123
-
-
 👨‍🎓 Contexto Acadêmico
 Este projeto foi desenvolvido como parte das atividades práticas da disciplina de Introdução à Computação, integrante da grade curricular do Bacharelado em Ciência da Computação do IFRS – Campus Ibirubá.
 
