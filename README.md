@@ -35,14 +35,15 @@ O GuardaFácil é uma plataforma web que permite que alunos reservem armários d
 🔑 Credenciais de Teste
 
 Usuários comuns
-Matrícula	Senha
-20240012	123456
-20240001	senha123
+
+Matrícula	 Senha
+20240012	 123456
+20240001	 senha123
 
 Administrador
 
-Usuário	Senha
-admin	admin123
+Usuário	 Senha
+admin	   admin123
 
 
 👨‍🎓 Contexto Acadêmico
