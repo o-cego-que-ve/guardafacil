@@ -843,39 +843,54 @@
        // ============================================================
     // LOGIN
     // ============================================================
-    async function doLogin(e) {
+        async function doLogin(e) {
         if (e) e.preventDefault();
         const mat = document.getElementById("loginMatricula").value.trim();
         const senha = document.getElementById("loginSenha").value.trim();
         
-        console.log('📝 Tentando login:', { matricula: mat, senha: '***' });
+        console.log('🔑 Tentando login:', { matricula: mat, senha: senha });
 
-        try {
-            // VERIFICA SE É ADMIN
-            if (mat === 'admin' && senha === 'admin123') {
-                const result = await apiCall('/admin/login', 'POST', { usuario: mat, senha });
-                if (result.ok && result.data?.success) {
+        // ADMIN
+        if (mat === 'admin' && senha === 'admin123') {
+            try {
+                const response = await fetch(`${API_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario: mat, senha: senha })
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
                     isAdmin = true;
                     usuarioLogado = { matricula: 'admin', nome: 'Administrador' };
                     document.getElementById("loginError").innerText = "";
                     showScreen('adminDashboard');
                     carregarAdminDashboard();
-                } else {
-                    document.getElementById("loginError").innerText = "Erro no login administrativo.";
+                    return;
                 }
-                return;
+            } catch (error) {
+                console.error('Erro no login admin:', error);
             }
+            document.getElementById("loginError").innerText = "Erro no login administrativo.";
+            return;
+        }
 
-            // LOGIN NORMAL
-            const result = await apiCall('/login', 'POST', { matricula: mat, senha });
-            console.log('📥 Resposta do login:', result);
+        // LOGIN NORMAL
+        try {
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ matricula: mat, senha: senha })
+            });
             
-            if (result.ok && result.data?.success) {
-                usuarioLogado = result.data.user;
+            const data = await response.json();
+            console.log('📥 Resposta do servidor:', data);
+
+            if (response.ok && data.success) {
+                usuarioLogado = data.user;
                 isAdmin = false;
                 sessionStorage.setItem("guardafacil_session", JSON.stringify({ 
                     matricula: mat, 
-                    nome: result.data.user.nome 
+                    nome: data.user.nome 
                 }));
                 showScreen('dashboard');
                 await renderizarDashboard();
@@ -885,7 +900,7 @@
                 atualizarNavbarSobre();
                 atualizarBotaoSobre();
             } else {
-                const erroMsg = result.data?.error || "Credenciais inválidas.";
+                const erroMsg = data.error || "Credenciais inválidas.";
                 document.getElementById("loginError").innerText = erroMsg;
                 console.error('❌ Erro no login:', erroMsg);
             }
@@ -898,40 +913,27 @@
         // ============================================================
     // CADASTRO
     // ============================================================
-    async function doCadastro(e) {
+      async function doCadastro(e) {
         if (e) e.preventDefault();
         
-        // PEGA OS VALORES E REMOVE ESPAÇOS
         const nome = document.getElementById("cadNome").value.trim();
         const mat = document.getElementById("cadMatricula").value.trim();
         const senha = document.getElementById("cadSenha").value.trim();
 
-        // LOG PARA VER O QUE ESTÁ SENDO ENVIADO
-        console.log('📝 Nome:', nome);
-        console.log('📝 Matrícula:', mat);
-        console.log('📝 Senha:', senha);
+        console.log('📝 Cadastro:', { nome, mat, senha });
 
-        // VALIDAÇÃO 1: campos vazios
         if (!nome || !mat || !senha) {
             document.getElementById("cadError").innerText = "Preencha todos os campos.";
-            console.error('❌ Campos vazios!');
             return;
         }
 
-        // VALIDAÇÃO 2: senha muito curta
         if (senha.length < 6) {
             document.getElementById("cadError").innerText = "A senha deve ter pelo menos 6 caracteres.";
             return;
         }
 
-        // VALIDAÇÃO 3: matrícula muito curta
-        if (mat.length < 5) {
-            document.getElementById("cadError").innerText = "Matrícula inválida (mínimo 5 caracteres).";
-            return;
-        }
-
         try {
-            // CHAMA A API DIRETAMENTE COM FETCH PARA TER MAIS CONTROLE
+            // 🔥 CHAMADA DIRETA SEM apiCall
             const response = await fetch(`${API_URL}/cadastro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -947,7 +949,6 @@
 
             if (response.ok && data.success) {
                 alert("✅ Cadastro realizado! Faça login.");
-                // Limpa os campos
                 document.getElementById("cadNome").value = "";
                 document.getElementById("cadMatricula").value = "";
                 document.getElementById("cadSenha").value = "";
@@ -963,7 +964,6 @@
             document.getElementById("cadError").innerText = "Erro de conexão com o servidor.";
         }
     }
-
     // ============================================================
     // EVENTOS E INICIALIZAÇÃO
     // ============================================================
