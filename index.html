@@ -840,10 +840,10 @@
     // ============================================================
     // LOGIN / CADASTRO
     // ============================================================
-       // ============================================================
+           // ============================================================
     // LOGIN
     // ============================================================
-        async function doLogin(e) {
+    async function doLogin(e) {
         if (e) e.preventDefault();
         const mat = document.getElementById("loginMatricula").value.trim();
         const senha = document.getElementById("loginSenha").value.trim();
@@ -894,7 +894,14 @@
                 }));
                 showScreen('dashboard');
                 await renderizarDashboard();
-                initDashboardEvents();
+                
+                // ✅ VERIFICA SE initDashboardEvents EXISTE ANTES DE CHAMAR
+                if (typeof initDashboardEvents === 'function') {
+                    initDashboardEvents();
+                } else {
+                    console.warn('⚠️ initDashboardEvents não encontrada');
+                }
+                
                 await buscarEFiltrarArmarios();
                 document.getElementById("loginError").innerText = "";
                 atualizarNavbarSobre();
