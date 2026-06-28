@@ -1,26 +1,105 @@
-﻿const express = require('express');
+const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const db = require('./database');
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// ============================================================
+// ✅ CORS CORRIGIDO - Permite qualquer origem
+// ============================================================
+app.use(cors({
+    origin: '*',  // Permite qualquer origem (GitHub Pages, localhost, etc.)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Middlewares
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Caminho do banco de dados
+const dbPath = path.join(__dirname, 'guardafacil.db');
+const db = new sqlite3.Database(dbPath);
+
+// Criar tabelas
+db.serialize(() => {
+    db.run(`
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            matricula TEXT UNIQUE NOT NULL,
+            nome TEXT NOT NULL,
+            senha TEXT NOT NULL,
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS reservas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            matricula TEXT NOT NULL,
+            nomeUsuario TEXT NOT NULL,
+            armario TEXT NOT NULL,
+            inicioTimestamp INTEGER NOT NULL,
+            duracaoHoras INTEGER NOT NULL,
+            status TEXT DEFAULT 'ativa',
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matricula) REFERENCES usuarios(matricula)
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS armarios_bloqueados (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            armario TEXT UNIQUE NOT NULL,
+            bloqueado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    // Inserir usuários padrão
+    db.get("SELECT COUNT(*) as count FROM usuarios", (err, row) => {
+        if (err) {
+            console.error('Erro ao verificar usuários:', err);
+            return;
+        }
+        if (row.count === 0) {
+            db.run("INSERT INTO usuarios (matricula, nome, senha) VALUES (?, ?, ?)",
+                ['20240012', 'Ana Carolina Souza', '123456']);
+            db.run("INSERT INTO usuarios (matricula, nome, senha) VALUES (?, ?, ?)",
+                ['20240001', 'João Pedro Lima', 'senha123']);
+            console.log('✅ Usuários padrão criados!');
+        }
+    });
+});
+
+// ---------- ROTA RAIZ (TESTE) ----------
+app.get('/', (req, res) => {
+    res.json({
+        message: '🚀 Servidor GuardaFácil rodando!',
+        status: 'online',
+        cors: 'enabled'
+    });
+});
 
 // ---------- ROTAS DE USUÁRIO ----------
-
 app.post('/api/login', (req, res) => {
     const { matricula, senha } = req.body;
+    console.log('🔑 Tentativa de login:', { matricula, senha });
     db.get(
         "SELECT * FROM usuarios WHERE matricula = ? AND senha = ?",
         [matricula, senha],
         (err, user) => {
-            if (err) return res.status(500).json({ error: 'Erro no servidor' });
+            if (err) {
+                console.error('Erro no login:', err);
+                return res.status(500).json({ error: 'Erro no servidor' });
+            }
             if (user) {
+                console.log('✅ Login bem-sucedido:', user.matricula);
                 res.json({ success: true, user: { matricula: user.matricula, nome: user.nome } });
             } else {
+                console.log('❌ Login falhou:', { matricula, senha });
                 res.status(401).json({ success: false, error: 'Matrícula ou senha incorretos' });
             }
         }
@@ -29,16 +108,20 @@ app.post('/api/login', (req, res) => {
 
 app.post('/api/cadastro', (req, res) => {
     const { matricula, nome, senha } = req.body;
+    console.log('📝 Cadastro:', { matricula, nome, senha });
     db.run(
         "INSERT INTO usuarios (matricula, nome, senha) VALUES (?, ?, ?)",
         [matricula, nome, senha],
         function(err) {
             if (err) {
                 if (err.message.includes('UNIQUE')) {
+                    console.log('❌ Matrícula já existe:', matricula);
                     return res.status(400).json({ success: false, error: 'Matrícula já existe' });
                 }
+                console.error('Erro no cadastro:', err);
                 return res.status(500).json({ success: false, error: 'Erro ao cadastrar' });
             }
+            console.log('✅ Cadastro bem-sucedido:', matricula);
             res.json({ success: true, message: 'Usuário cadastrado com sucesso' });
         }
     );
@@ -105,7 +188,6 @@ app.post('/api/armarios/disponibilidade', (req, res) => {
 });
 
 // ---------- ROTAS ADMIN ----------
-
 app.post('/api/admin/login', (req, res) => {
     const { usuario, senha } = req.body;
     if (usuario === 'admin' && senha === 'admin123') {
@@ -137,7 +219,6 @@ app.delete('/api/admin/reservas/:id', (req, res) => {
     });
 });
 
-// ---------- ROTAS DE BLOQUEIO ----------
 app.get('/api/admin/armarios/bloqueados', (req, res) => {
     db.all("SELECT armario FROM armarios_bloqueados", (err, rows) => {
         if (err) return res.status(500).json({ error: 'Erro no servidor' });
@@ -161,8 +242,10 @@ app.delete('/api/admin/armarios/bloquear/:armario', (req, res) => {
     });
 });
 
+// ---------- INICIAR SERVIDOR ----------
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
     console.log(`📡 API disponível em http://localhost:${PORT}/api`);
     console.log(`👑 Admin: usuario=admin, senha=admin123`);
+    console.log(`✅ CORS habilitado para todas as origens`);
 });
