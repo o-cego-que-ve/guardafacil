@@ -46,6 +46,7 @@ Este projeto é de uso acadêmico e educacional. Todos os direitos reservados.
 
 👥 Equipe
 Desenvolvido por estudantes do Bacharelado em Ciência da Computação – IFRS Campus Ibirubá.
+
 <img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 30" src="https://github.com/user-attachments/assets/bbf76e06-0f37-48ab-a439-59582216fca4" />
 <img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 35" src="https://github.com/user-attachments/assets/88b37bf9-b5e7-4f73-8c78-b94084a77d25" />
 <img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 38" src="https://github.com/user-attachments/assets/c3bcce8b-8276-43b7-9c0a-195c85ee9f9c" />
