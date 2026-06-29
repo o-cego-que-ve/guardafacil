@@ -1,3 +1,6 @@
+
+<img width="1600" height="640" alt="WhatsApp Image 2026-06-28 at 22 40 14" src="https://github.com/user-attachments/assets/634c047a-afe7-4b82-975d-ad99e78ca1be" />
+
 # 🔐 GuardaFácil
 
 **Sistema de gestão de armários** desenvolvido como projeto acadêmico para o curso de **Bacharelado em Ciência da Computação** do **Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Sul (IFRS) – Campus Ibirubá**.
