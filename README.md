@@ -47,15 +47,26 @@ Este projeto é de uso acadêmico e educacional. Todos os direitos reservados.
 👥 Equipe
 Desenvolvido por estudantes do Bacharelado em Ciência da Computação – IFRS Campus Ibirubá.
 
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 30" src="https://github.com/user-attachments/assets/bbf76e06-0f37-48ab-a439-59582216fca4" />
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 35" src="https://github.com/user-attachments/assets/88b37bf9-b5e7-4f73-8c78-b94084a77d25" />
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 38" src="https://github.com/user-attachments/assets/c3bcce8b-8276-43b7-9c0a-195c85ee9f9c" />
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 42" src="https://github.com/user-attachments/assets/4fab3eec-bc9f-4c26-847e-05bbc0ac5733" />
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 46" src="https://github.com/user-attachments/assets/5f4c5541-cb67-4d53-906d-d5bb99f4b37b" />
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 50" src="https://github.com/user-attachments/assets/f231301e-216e-4b23-817b-af924f19e593" />
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 55" src="https://github.com/user-attachments/assets/1ef7b40d-8f01-4d26-8db8-33cf7791489a" />
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 46 58" src="https://github.com/user-attachments/assets/d1de621d-2e6e-4d4c-bace-43e7a5e7a1d4" />
-<img width="300" height="450" alt="WhatsApp Image 2026-06-28 at 22 47 01" src="https://github.com/user-attachments/assets/7124bcc4-debb-4803-9faf-a217a5aaa875" />
+##Página de Login e Cadastro
+<img width="900" height="400" alt="Cadastro" src="https://github.com/user-attachments/assets/960134e3-ae01-454a-9832-7f5cea62efea" />
+<img width="900" height="300" alt="Tela de login" src="https://github.com/user-attachments/assets/6a8b4bd0-2c34-4ea7-8a4f-b33023b2dc91" />
+
+##Dashboard do Usuário
+<img width="880" height="430" alt="Início imagem" src="https://github.com/user-attachments/assets/bf8d0c2b-0324-4f87-a754-4539f9c689c4" />
+<img width="913" height="433" alt="Início imagem 2" src="https://github.com/user-attachments/assets/403ddbc2-d7a6-40f9-8861-56de5e2fdbcf" />
+
+##Página que fala sobre o projeto
+<img width="900" height="440" alt="Sobre" src="https://github.com/user-attachments/assets/7943431d-21ba-4cfa-8bbb-c2ba0016f7ab" />
+<img width="925" height="448" alt="Sobre 2" src="https://github.com/user-attachments/assets/b8c1546d-ca58-41a5-9bb5-cd46e8014163" />
+
+##Dashboard do Admin
+<img width="940" height="445" alt="Tela admin" src="https://github.com/user-attachments/assets/dbd02857-f4a6-4200-bb58-98707828b83c" />
+<img width="925" height="450" alt="Tela admin 2" src="https://github.com/user-attachments/assets/ee0f9753-6c50-4e97-907e-abca59a98bc1" />
+
+
+
+
+
 
 
 
