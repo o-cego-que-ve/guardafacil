@@ -9,7 +9,7 @@
 
 ## 📌 Sobre o Projeto
 
-O GuardaFácil é uma plataforma web que permite que alunos reservem armários de forma autônoma e transparente, eliminando a necessidade de controles manuais (planilhas, papel, etc.). O sistema oferece:
+O GuardaFácil é uma plataforma web que permite que alunos reservem armários de forma autônoma e transparente, eliminando a necessidade de controles manuais (planilhas, papel, etc.). O site GuardaFácil está em versões iniciais. O sistema oferece:
 
 - ✅ Login de usuários (alunos) com matrícula e senha
 - ✅ Reserva de armários com escolha de data, hora e duração
